@@ -1,0 +1,426 @@
+---
+title: "STA 160 Project"
+author: "Austin Chen"
+date: "4/13/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#install.packages("ggplot2")
+#install.packages("tidyverse")
+Kinematics_Data <- read.csv("~/Desktop/STA 160/Kinematics_Data.csv")
+Kinematics_Data$activity = as.factor(Kinematics_Data$activity)
+View(Kinematics_Data)
+```
+
+summaries of columns
+missing values
+
+
+
+```{r}
+summary(Kinematics_Data)
+```
+
+```{r}
+sum(is.na(Kinematics_Data))
+```
+
+No NA values
+
+We have no missing values and data cleaning isn't necessary.
+
+```{r}
+wrist_activity = cbind.data.frame(Kinematics_Data$wrist, Kinematics_Data$activity)
+wrist_activity_table = table(wrist_activity)
+wrist_activity_table
+```
+
+Walking and right wrist combination happens the most. 
+
+```{r}
+test = chisq.test(wrist_activity_table)
+eij = test$expected
+test
+eij
+
+```
+
+
+In the chi-squared test for independence, at alpha = 0.05, we can conclude that wrist and activity are dependent of each other. We will investigate this further. 
+
+```{r}
+#correlation
+subset = Kinematics_Data[ , c("acceleration_x", "acceleration_y", "acceleration_z", "gyro_x", "gyro_y", "gyro_z")]   
+cor(subset)
+```
+
+```{r}
+#install.packages("scales")
+library(tidyverse)
+ggplot(Kinematics_Data, 
+       aes(x = acceleration_x , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_x by activity")
+```
+
+# guesses
+x is side by side
+y is forward or backwards
+z is up and down
+
+add mean lines on plot
+study effect of wrist
+
+
+```{r}
+ggplot(Kinematics_Data, 
+       aes(x = acceleration_y , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_y by activity")
+```
+
+```{r}
+ggplot(Kinematics_Data, 
+       aes(x = acceleration_z , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_z by activity")
+```
+
+```{r}
+ggplot(Kinematics_Data, 
+       aes(x = gyro_x , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_x by activity")
+```
+
+```{r}
+ggplot(Kinematics_Data, 
+       aes(x = gyro_y , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_y by activity")
+```
+
+
+```{r}
+ggplot(Kinematics_Data, 
+       aes(x = gyro_z , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_z by activity")
+```
+
+```{r}
+#install.packages("scatterplot3d") # Install
+library("scatterplot3d") # load
+colors <- c("blue", "red")
+colors <- colors[as.numeric(Kinematics_Data$activity)]
+scatterplot3d(Kinematics_Data$gyro_x,Kinematics_Data$gyro_y,Kinematics_Data$gyro_z, color = colors)
+legend("right",legend = c("walking", "running"),
+      col =  c("blue", "red"), pch = 6)
+```
+
+```{r}
+colors <- c("blue", "red")
+colors <- colors[as.numeric(Kinematics_Data$activity)]
+scatterplot3d(Kinematics_Data$acceleration_x,Kinematics_Data$acceleration_y,Kinematics_Data$acceleration_z, color = colors)
+legend("right",legend = c("walking", "running"),
+      col =  c("blue", "red"), pch = 6)
+```
+
+```{r}
+colors <- c("blue", "red")
+colors <- ifelse(Kinematics_Data$wrist == 0, "blue", "red")
+scatterplot3d(Kinematics_Data$acceleration_x,Kinematics_Data$acceleration_y,Kinematics_Data$acceleration_z, color = colors)
+legend("right",legend = c("left wrist", "right wrist"),col =  c("blue", "red"), pch = 6)
+```
+
+```{r}
+colors <- c("blue", "red")
+colors <- ifelse(Kinematics_Data$wrist == 0, "blue", "red")
+scatterplot3d(Kinematics_Data$gyro_x,Kinematics_Data$gyro_y,Kinematics_Data$gyro_z, color = colors)
+legend("right",legend = c("left wrist", "right wrist"),col =  c("blue", "red"), pch = 6)
+```
+
+## Data and plots for left wrist and walking
+
+```{r}
+zerozero_data = Kinematics_Data[Kinematics_Data['wrist'] == 0 & Kinematics_Data['activity'] == 0,]
+zerozero_data
+```
+
+```{r}
+summary(zerozero_data)
+```
+
+```{r}
+#install.packages("scales")
+library(tidyverse)
+ggplot(zerozero_data, 
+       aes(x = acceleration_x , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_x by activity on left wrist")
+```
+
+
+
+
+```{r}
+ggplot(zerozero_data, 
+       aes(x = acceleration_y , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_y by activity on left wrist")
+```
+
+```{r}
+ggplot(zerozero_data, 
+       aes(x = acceleration_z , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_z by activity on left wrist")
+```
+
+```{r}
+ggplot(zerozero_data, 
+       aes(x = gyro_x , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_x by activity on left wrist")
+```
+
+```{r}
+ggplot(zerozero_data, 
+       aes(x = gyro_y , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_y by activity on left wrist")
+```
+
+
+```{r}
+ggplot(zerozero_data, 
+       aes(x = gyro_z , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_z by activity on left wrist")
+```
+
+
+
+## Data and plots for right wrist and walking 
+
+```{r}
+onezero_data = Kinematics_Data[Kinematics_Data['wrist'] == 1 & Kinematics_Data['activity'] == 0,]
+onezero_data
+```
+
+```{r}
+summary(onezero_data)
+```
+
+
+```{r}
+#install.packages("scales")
+library(tidyverse)
+ggplot(onezero_data, 
+       aes(x = acceleration_x , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_x by activity on right wrist")
+```
+
+
+
+```{r}
+ggplot(onezero_data, 
+       aes(x = acceleration_y , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_y by activity on right wrist")
+```
+
+```{r}
+ggplot(onezero_data, 
+       aes(x = acceleration_z , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_z by activity on right wrist")
+```
+
+```{r}
+ggplot(onezero_data, 
+       aes(x = gyro_x , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_x by activity on right wrist")
+```
+
+```{r}
+ggplot(onezero_data, 
+       aes(x = gyro_y , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_y by activity on right wrist")
+```
+
+
+```{r}
+ggplot(onezero_data, 
+       aes(x = gyro_z , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_z by activity on right wrist")
+```
+
+
+
+## Data and plots for left wrist and running
+
+
+```{r}
+zeroone_data = Kinematics_Data[Kinematics_Data['wrist'] == 0 & Kinematics_Data['activity'] == 1,]
+zeroone_data
+```
+
+```{r}
+summary(zeroone_data)
+```
+
+```{r}
+#install.packages("scales")
+library(tidyverse)
+ggplot(zeroone_data, 
+       aes(x = acceleration_x , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_x by activity on left wrist")
+```
+
+
+
+```{r}
+ggplot(zeroone_data, 
+       aes(x = acceleration_y , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_y by activity on left wrist")
+```
+
+```{r}
+ggplot(zeroone_data, 
+       aes(x = acceleration_z , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_z by activity on left wrist")
+```
+
+```{r}
+ggplot(zeroone_data, 
+       aes(x = gyro_x , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_x by activity on left wrist")
+```
+
+```{r}
+ggplot(zeroone_data, 
+       aes(x = gyro_y , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_y by activity on left wrist")
+```
+
+
+```{r}
+ggplot(zeroone_data, 
+       aes(x = gyro_z , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_z by activity on left wrist")
+```
+
+
+## Data and plots for right wrist and running
+
+
+```{r}
+oneone_data= Kinematics_Data[Kinematics_Data['wrist'] == 1 & Kinematics_Data['activity'] == 1,]
+oneone_data
+```
+
+```{r}
+summary(oneone_data)
+```
+
+```{r}
+#install.packages("scales")
+library(tidyverse)
+ggplot(oneone_data, 
+       aes(x = acceleration_x , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_x by activity on right wrist")
+```
+
+
+```{r}
+ggplot(oneone_data, 
+       aes(x = acceleration_y , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_y by activity on right wrist")
+```
+
+```{r}
+ggplot(oneone_data, 
+       aes(x = acceleration_z , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Acceleration_z by activity on right wrist")
+```
+
+```{r}
+ggplot(oneone_data, 
+       aes(x = gyro_x , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_x by activity on right wrist")
+```
+
+```{r}
+ggplot(oneone_data, 
+       aes(x = gyro_y , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_y by activity on right wrist")
+```
+
+
+```{r}
+ggplot(oneone_data, 
+       aes(x = gyro_z , 
+           fill = activity)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "gyro_z by activity on right wrist")
+```
+
+
+
+
+
+
+
+
+
+
